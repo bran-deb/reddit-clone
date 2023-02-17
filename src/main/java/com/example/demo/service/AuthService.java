@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.controller.dto.RegisterRequest;
+import com.example.demo.model.NotificationEmail;
 import com.example.demo.model.User;
 import com.example.demo.model.VerificationToken;
 import com.example.demo.repository.UserRepository;
@@ -20,6 +21,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final MailService mailService;
 
     @Transactional
     public void signup(RegisterRequest registerRequest) {
@@ -32,6 +34,10 @@ public class AuthService {
 
         userRepository.save(user);
         String token = generateVerificationToken(user);
+        mailService.sendMail(new NotificationEmail("Please Activate your account",
+                user.getEmail(), "Thank you for signing up to spring Reddit, "
+                + "please click on the below url to activate your account : " +
+                "http://localhost:8080/api/auth/accountVerification/" + token));
     }
 
     private String generateVerificationToken(User user) {
